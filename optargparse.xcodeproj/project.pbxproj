@@ -7,14 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BC74E5821E5BF48E00E717C9 /* optargparse.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74E5811E5BF48E00E717C9 /* optargparse.h */; };
-		BC74E5841E5BF48E00E717C9 /* optargparse.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E5831E5BF48E00E717C9 /* optargparse.m */; };
+		BC74E5931E5BF49B00E717C9 /* liboptargparse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */; };
+		BC74E59B1E5BF4D600E717C9 /* OAPArgumentParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */; };
+		BC74E59C1E5BF4D600E717C9 /* OAPArgumentParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E59A1E5BF4D600E717C9 /* OAPArgumentParser.m */; };
+		BC74E5A91E5C2C1C00E717C9 /* OAPArgumentParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E5A81E5C2C1C00E717C9 /* OAPArgumentParserTests.m */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BC74E5941E5BF49B00E717C9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BC74E5761E5BF48E00E717C9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BC74E57D1E5BF48E00E717C9;
+			remoteInfo = optargparse;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboptargparse.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BC74E5811E5BF48E00E717C9 /* optargparse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = optargparse.h; sourceTree = "<group>"; };
-		BC74E5831E5BF48E00E717C9 /* optargparse.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = optargparse.m; sourceTree = "<group>"; };
+		BC74E58E1E5BF49B00E717C9 /* optargparseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = optargparseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC74E5921E5BF49B00E717C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OAPArgumentParser.h; sourceTree = "<group>"; };
+		BC74E59A1E5BF4D600E717C9 /* OAPArgumentParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAPArgumentParser.m; sourceTree = "<group>"; };
+		BC74E5A81E5C2C1C00E717C9 /* OAPArgumentParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OAPArgumentParserTests.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -25,6 +40,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		BC74E58B1E5BF49B00E717C9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC74E5931E5BF49B00E717C9 /* liboptargparse.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -32,6 +55,7 @@
 			isa = PBXGroup;
 			children = (
 				BC74E5801E5BF48E00E717C9 /* optargparse */,
+				BC74E58F1E5BF49B00E717C9 /* optargparseTests */,
 				BC74E57F1E5BF48E00E717C9 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -40,6 +64,7 @@
 			isa = PBXGroup;
 			children = (
 				BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */,
+				BC74E58E1E5BF49B00E717C9 /* optargparseTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -47,10 +72,19 @@
 		BC74E5801E5BF48E00E717C9 /* optargparse */ = {
 			isa = PBXGroup;
 			children = (
-				BC74E5811E5BF48E00E717C9 /* optargparse.h */,
-				BC74E5831E5BF48E00E717C9 /* optargparse.m */,
+				BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */,
+				BC74E59A1E5BF4D600E717C9 /* OAPArgumentParser.m */,
 			);
 			path = optargparse;
+			sourceTree = "<group>";
+		};
+		BC74E58F1E5BF49B00E717C9 /* optargparseTests */ = {
+			isa = PBXGroup;
+			children = (
+				BC74E5921E5BF49B00E717C9 /* Info.plist */,
+				BC74E5A81E5C2C1C00E717C9 /* OAPArgumentParserTests.m */,
+			);
+			path = optargparseTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -60,7 +94,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC74E5821E5BF48E00E717C9 /* optargparse.h in Headers */,
+				BC74E59B1E5BF4D600E717C9 /* OAPArgumentParser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +118,24 @@
 			productReference = BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		BC74E58D1E5BF49B00E717C9 /* optargparseTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC74E5961E5BF49B00E717C9 /* Build configuration list for PBXNativeTarget "optargparseTests" */;
+			buildPhases = (
+				BC74E58A1E5BF49B00E717C9 /* Sources */,
+				BC74E58B1E5BF49B00E717C9 /* Frameworks */,
+				BC74E58C1E5BF49B00E717C9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BC74E5951E5BF49B00E717C9 /* PBXTargetDependency */,
+			);
+			name = optargparseTests;
+			productName = optargparseTests;
+			productReference = BC74E58E1E5BF49B00E717C9 /* optargparseTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -94,6 +146,10 @@
 				ORGANIZATIONNAME = "Scott Perry";
 				TargetAttributes = {
 					BC74E57D1E5BF48E00E717C9 = {
+						CreatedOnToolsVersion = 8.3;
+						ProvisioningStyle = Automatic;
+					};
+					BC74E58D1E5BF49B00E717C9 = {
 						CreatedOnToolsVersion = 8.3;
 						ProvisioningStyle = Automatic;
 					};
@@ -112,20 +168,47 @@
 			projectRoot = "";
 			targets = (
 				BC74E57D1E5BF48E00E717C9 /* optargparse */,
+				BC74E58D1E5BF49B00E717C9 /* optargparseTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BC74E58C1E5BF49B00E717C9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		BC74E57A1E5BF48E00E717C9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BC74E5841E5BF48E00E717C9 /* optargparse.m in Sources */,
+				BC74E59C1E5BF4D600E717C9 /* OAPArgumentParser.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BC74E58A1E5BF49B00E717C9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC74E5A91E5C2C1C00E717C9 /* OAPArgumentParserTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BC74E5951E5BF49B00E717C9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BC74E57D1E5BF48E00E717C9 /* optargparse */;
+			targetProxy = BC74E5941E5BF49B00E717C9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		BC74E5851E5BF48E00E717C9 /* Debug */ = {
@@ -233,6 +316,28 @@
 			};
 			name = Release;
 		};
+		BC74E5971E5BF49B00E717C9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = optargparseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = net.numist.optargparseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BC74E5981E5BF49B00E717C9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = optargparseTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = net.numist.optargparseTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -252,6 +357,16 @@
 				BC74E5891E5BF48E00E717C9 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC74E5961E5BF49B00E717C9 /* Build configuration list for PBXNativeTarget "optargparseTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BC74E5971E5BF49B00E717C9 /* Debug */,
+				BC74E5981E5BF49B00E717C9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
