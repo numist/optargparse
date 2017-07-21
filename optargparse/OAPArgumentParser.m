@@ -48,7 +48,9 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 @end
 
 
-
+@interface OAPArgumentParser ()
+@property (assign) BOOL usesProcessArguments;
+@end
 @implementation OAPArgumentParser
 
 #pragma mark - Object creation
@@ -58,7 +60,10 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 }
 
 - (instancetype)init {
-    return [self initWithArguments:[[NSProcessInfo processInfo] arguments]];
+    if (!(self = [self initWithArguments:[[NSProcessInfo processInfo] arguments]])) { return nil; }
+    // [[NSProcessInfo processInfo] arguments] includes the name of the executable as the 0th argument, thus option parsing begins at index 1 by default.
+    self.usesProcessArguments = YES;
+    return self;
 }
 
 - (instancetype)initWithArguments:(NSArray<NSString *> *)args {
@@ -84,8 +89,12 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 @synthesize matchPrefixes = _matchPrefixes;
 - (void)setMatchPrefixes:(BOOL)matchPrefixes {
     if (matchPrefixes == YES && !isatty(fileno(stdin))) {
+        /*
+         * Allowing scripts to use prefix matching introduces a class of binary
+         * compatibility concerns that should terrify any responsible tool
+         * author.
+         */
         matchPrefixes = NO;
-        // XXX: to log, or not to log?
     }
     self->_matchPrefixes = matchPrefixes;
 }
@@ -171,12 +180,12 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
     __OAPCallbackList *callbacks = [__OAPCallbackList new];
     
     if (self->_arguments.count == 0) {
-        self->_argumentOffset = -1;
+        self->_argumentOffset = 0;
         return YES;
     }
     
     if (self->_argumentOffset < 0) {
-        self->_argumentOffset = 1;
+        self->_argumentOffset = self->_usesProcessArguments ? 1 : 0;
     }
     
     optionValidator(self, options);
@@ -199,7 +208,14 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         
         // @":" is a valid flag for option definitions, but is not a valid character in the option name.
         if ([token hasSuffix:@":"]) {
-            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{NSLocalizedDescriptionKey: @"Unrecognized option", @"option": token}];
+            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
+                        NSLocalizedDescriptionKey: @"Unrecognized option",
+                        @"option": token,
+#ifndef NDEBUG
+                        @"func": @(__func__),
+                        @"line": @(__LINE__),
+#endif
+                    }];
             return (_Bool)false;
         }
         
@@ -209,7 +225,14 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // name=
         if ([options containsObject:equalSuffixedOptionName]) {
             if (value == nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{NSLocalizedDescriptionKey: @"Option requires an argument", @"option": parsedOptionName}];
+                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{
+                            NSLocalizedDescriptionKey: @"Option requires an argument",
+                            @"option": parsedOptionName,
+#ifndef NDEBUG
+                            @"func": @(__func__),
+                            @"line": @(__LINE__),
+#endif
+                        }];
                 return (_Bool)false;
             }
             
@@ -221,7 +244,14 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // name
         if ([options containsObject:parsedOptionName]) {
             if (value != nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{NSLocalizedDescriptionKey: @"Unexpected argument for option", @"option": parsedOptionName}];
+                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{
+                            NSLocalizedDescriptionKey: @"Unexpected argument for option",
+                            @"option": parsedOptionName,
+#ifndef NDEBUG
+                            @"func": @(__func__),
+                            @"line": @(__LINE__),
+#endif
+                        }];
                 return (_Bool)false;
             }
             
@@ -233,12 +263,26 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // name:
         if ([options containsObject:colonSuffixedOptionName]) {
             if (value != nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{NSLocalizedDescriptionKey: @"Space-separated argument expected for option", @"option": parsedOptionName}];
+                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{
+                            NSLocalizedDescriptionKey: @"Space-separated argument expected for option",
+                            @"option": parsedOptionName,
+#ifndef NDEBUG
+                            @"func": @(__func__),
+                            @"line": @(__LINE__),
+#endif
+                        }];
                 return (_Bool)false;
             }
             
             if (argumentOffset + 1 >= arguments.count) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{NSLocalizedDescriptionKey: @"Option requires an argument", @"option": parsedOptionName}];
+                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{
+                            NSLocalizedDescriptionKey: @"Option requires an argument",
+                            @"option": parsedOptionName,
+#ifndef NDEBUG
+                            @"func": @(__func__),
+                            @"line": @(__LINE__),
+#endif
+                        }];
                 return (_Bool)false;
             }
             
@@ -314,6 +358,8 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
             }
             // End of duped code
 
+            NSLog(@"token: %@", token);
+
             NSMutableSet *possibilities = [NSMutableSet new];
             for (__strong NSString *option in options) {
                 option = sanitizedNameForOption(option);
@@ -329,14 +375,23 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                 }
                 _Bool success = parseToken(option);
                 NSAssert(success == true, @"How?");
+                if (error) {
+                    // Should not be possible
+                    break;
+                }
                 if (success) {
                     continue;
                 }
-                if (error) {
-                    break;
-                }
             } else if (possibilities.count > 1) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{NSLocalizedDescriptionKey: @"Argument matches mutliple options", @"option": parsedOptionName, @"matches": [possibilities copy]}];
+                error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
+                            NSLocalizedDescriptionKey: @"Argument matches mutliple options",
+                            @"option": parsedOptionName,
+                            @"matches": [possibilities copy],
+#ifndef NDEBUG
+                            @"func": NSStringFromSelector(_cmd),
+                            @"line": @(__LINE__),
+#endif
+                        }];
                 break;
             }
         }
@@ -347,7 +402,14 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // Unrecognized option. Error or break depending on hyphen-prefix
         //
         if ([token hasPrefix:@"-"]) {
-            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{NSLocalizedDescriptionKey: @"Unrecognized option", @"option": token}];
+            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
+                        NSLocalizedDescriptionKey: @"Unrecognized option",
+                        @"option": token,
+#ifndef NDEBUG
+                        @"func": NSStringFromSelector(_cmd),
+                        @"line": @(__LINE__),
+#endif
+                    }];
         }
         break;
     }

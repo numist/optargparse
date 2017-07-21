@@ -145,6 +145,12 @@
     XCTAssertEqual(error.code, OAPInvalidOptionError);
 }
 
+- (void)testThreeDashesNotSupported {
+    NSError *error;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-foo", @"asdf"]];
+    XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"---f:"])] error:&error handler:nil]);
+}
+
 - (void)testOptionPrefixMatching {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"st"]];
@@ -155,18 +161,25 @@
     }]);
 }
 
-- (void)testOptionPrefixMatchingParameter {
+- (void)testOptionPrefixMatchingEqualsParameter {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--f=bar"]];
     parser.matchPrefixes = YES;
-    XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo:"])] error:nil handler:nil]);
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo=", @"--bar"])] error:&error handler:^(NSString * _Nonnull option, NSString * _Nullable argument, NSError * _Nullable __autoreleasing * _Nullable error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo=", @"--bar"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTAssertEqualObjects(option, @"--foo");
         XCTAssertEqualObjects(argument, @"bar");
     }]);
-    if (error) {
-        NSLog(@"%@", error);
-    }
+}
+
+- (void)testOptionPrefixMatchingSpaceParameter {
+    NSError *error;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--f", @"bar"]];
+    parser.matchPrefixes = YES;
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        XCTAssertEqualObjects(option, @"--foo");
+        XCTAssertEqualObjects(argument, @"bar");
+    }]);
+    if (error) { NSLog(@"%@", error); }
 }
 
 - (void)testOptionPrefixMatchingCollision {
@@ -182,6 +195,7 @@
 - (void)testAmbiguousOptions {
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"-foo", @"-f", @"-o"])] error:nil handler:nil]);
+    XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"f", @"o"])] error:nil handler:nil]);
 }
 
 - (void)testUnambiguousOptions {
@@ -189,6 +203,22 @@
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"--foo", @"-f", @"-o"])] error:nil handler:nil]);
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"-foo", @"--f", @"--o"])] error:nil handler:nil]);
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"-foo", @"--foo", @"f", @"o"])] error:nil handler:nil]);
+}
+
+- (void)testInvalidColonSuffixArgument {
+    NSError *error = nil;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--foo:"]];
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:nil]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, OAPInvalidOptionError);
+}
+
+- (void)testNoArguments {
+    NSError *error = nil;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[]];
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:nil]);
+    XCTAssertEqual(0, parser.argumentOffset);
+    XCTAssertNil(error);
 }
 
 @end
