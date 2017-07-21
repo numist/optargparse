@@ -49,7 +49,7 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString * _Nonnull option, NSString * _Nullable argument, NSError * _Nullable __autoreleasing * _Nullable error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 4);
@@ -61,7 +61,7 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString * _Nonnull option, NSString * _Nullable argument, NSError * _Nullable __autoreleasing * _Nullable error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
         if ([option isEqualToString:@"-x"]) {
             XCTAssertEqualObjects(argument, @"foo.tar");
@@ -84,7 +84,7 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-lh1@", @"foo.tar", @"bar.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString * _Nonnull option, NSString * _Nullable argument, NSError * _Nullable __autoreleasing * _Nullable error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 4);

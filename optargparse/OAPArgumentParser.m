@@ -12,6 +12,7 @@ NSErrorDomain const OAPErrorDomain = @"OAPErrorDomain";
 
 
 @interface __OAPCallbackList : NSObject
+- (NSUInteger)count;
 - (void)addCallbackWithName:(NSString *)name value:(NSString *)value;
 - (NSError *)deliverCallbacksToHandler:(void(^)(NSString *option,  NSString *_Nullable argument, NSError **error))handler;
 @end
@@ -26,6 +27,9 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     if (!(self = [super init])) { return nil; }
     self->_callbacks = [NSMutableArray new];
     return self;
+}
+- (NSUInteger)count {
+    return self->_callbacks.count;
 }
 - (void)addCallbackWithName:(NSString *)name value:(NSString *)value {
     if (value) {
@@ -250,7 +254,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
     
     __block NSInteger argumentOffset = self->_argumentOffset;
     __block NSArray<NSString *> *arguments = self->_arguments;
-    
+
     //
     // Token parser
     //
@@ -354,6 +358,10 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
     };
 
     while (argumentOffset < arguments.count && error == nil) {
+        if (self->_matchLimit > 0 && callbacks.count >= self->_matchLimit) {
+            break;
+        }
+
         NSString *token = arguments[argumentOffset];
         
         //

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BC56A59E1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC56A59D1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m */; };
 		BC74E5931E5BF49B00E717C9 /* liboptargparse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */; };
 		BC74E59B1E5BF4D600E717C9 /* OAPArgumentParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */; };
 		BC74E59C1E5BF4D600E717C9 /* OAPArgumentParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E59A1E5BF4D600E717C9 /* OAPArgumentParser.m */; };
@@ -28,6 +29,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		BC56A59D1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OAPArgumentParserLimitTests.m; sourceTree = "<group>"; };
 		BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liboptargparse.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC74E58E1E5BF49B00E717C9 /* optargparseTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = optargparseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC74E5921E5BF49B00E717C9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 			children = (
 				BC74E5921E5BF49B00E717C9 /* Info.plist */,
 				BC74E5A81E5C2C1C00E717C9 /* OAPArgumentParserTests.m */,
+				BC56A59D1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m */,
 				BCD15A651F21B01800E475C4 /* OAPArguentParserErrorTests.m */,
 				BCD15A691F21B17000E475C4 /* OAPArgumentParserPrefixTests.m */,
 				BCD15A631F21AF4300E475C4 /* OAPArgumentParserLevenshteinTests.m */,
@@ -212,6 +215,7 @@
 				BCD15A641F21AF4300E475C4 /* OAPArgumentParserLevenshteinTests.m in Sources */,
 				BCD15A661F21B01800E475C4 /* OAPArguentParserErrorTests.m in Sources */,
 				BC74E5A91E5C2C1C00E717C9 /* OAPArgumentParserTests.m in Sources */,
+				BC56A59E1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m in Sources */,
 				BCD15A6A1F21B17000E475C4 /* OAPArgumentParserPrefixTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

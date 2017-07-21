@@ -36,6 +36,9 @@ typedef NS_ENUM(NSInteger, OAPError) {
 // Negative until the first invocation of parseOptions:error:handler:
 @property (nonatomic) NSInteger argumentOffset;
 
+// The number of matches to process before exiting. 0 for all (default).
+@property (nonatomic) NSUInteger matchLimit;
+
 // matchPrefixes and fuzzyMatching control imprecise matching of arguments.
 // These properties are disabled when the session is not interactive.
 
