@@ -212,7 +212,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                         NSLocalizedDescriptionKey: @"Unrecognized option",
                         @"option": token,
 #ifndef NDEBUG
-                        @"func": @(__func__),
+                        @"file": @(__FILE__),
                         @"line": @(__LINE__),
 #endif
                     }];
@@ -229,7 +229,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                             NSLocalizedDescriptionKey: @"Option requires an argument",
                             @"option": parsedOptionName,
 #ifndef NDEBUG
-                            @"func": @(__func__),
+                            @"file": @(__FILE__),
                             @"line": @(__LINE__),
 #endif
                         }];
@@ -248,7 +248,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                             NSLocalizedDescriptionKey: @"Unexpected argument for option",
                             @"option": parsedOptionName,
 #ifndef NDEBUG
-                            @"func": @(__func__),
+                            @"file": @(__FILE__),
                             @"line": @(__LINE__),
 #endif
                         }];
@@ -267,7 +267,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                             NSLocalizedDescriptionKey: @"Space-separated argument expected for option",
                             @"option": parsedOptionName,
 #ifndef NDEBUG
-                            @"func": @(__func__),
+                            @"file": @(__FILE__),
                             @"line": @(__LINE__),
 #endif
                         }];
@@ -279,7 +279,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                             NSLocalizedDescriptionKey: @"Option requires an argument",
                             @"option": parsedOptionName,
 #ifndef NDEBUG
-                            @"func": @(__func__),
+                            @"file": @(__FILE__),
                             @"line": @(__LINE__),
 #endif
                         }];
@@ -347,26 +347,26 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Prefix matching
         //
+        // Duped code from parseToken:
+        NSString *parsedOptionName = token;
+        NSString *value = nil;
+        if ([token containsString:@"="]) {
+            NSArray *split = [token componentsSeparatedByString:@"="];
+            parsedOptionName = split[0];
+            value = [token substringFromIndex:(parsedOptionName.length + 1)];
+        }
+        // End of duped code
+
+        NSLog(@"token: %@", token);
+
+        NSMutableSet *possibilities = [NSMutableSet new];
+        for (__strong NSString *option in options) {
+            option = sanitizedNameForOption(option);
+            if ([option hasPrefix:parsedOptionName]) {
+                [possibilities addObject:option];
+            }
+        }
         if (self->_matchPrefixes) {
-            // Duped code from parseToken:
-            NSString *parsedOptionName = token;
-            NSString *value = nil;
-            if ([token containsString:@"="]) {
-                NSArray *split = [token componentsSeparatedByString:@"="];
-                parsedOptionName = split[0];
-                value = [token substringFromIndex:(parsedOptionName.length + 1)];
-            }
-            // End of duped code
-
-            NSLog(@"token: %@", token);
-
-            NSMutableSet *possibilities = [NSMutableSet new];
-            for (__strong NSString *option in options) {
-                option = sanitizedNameForOption(option);
-                if ([option hasPrefix:parsedOptionName]) {
-                    [possibilities addObject:option];
-                }
-            }
             if (possibilities.count == 1) {
                 NSString *option = [possibilities anyObject];
                 if (value != nil) {
@@ -388,7 +388,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                             @"option": parsedOptionName,
                             @"matches": [possibilities copy],
 #ifndef NDEBUG
-                            @"func": NSStringFromSelector(_cmd),
+                            @"file": @(__FILE__),
                             @"line": @(__LINE__),
 #endif
                         }];
@@ -397,6 +397,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         }
 
         // TODO: this would be a good place to apply a levenshtein distance calculation to see if the argument can be inferred
+        // For now, the error includes possibilities by prefix matching only
 
         //
         // Unrecognized option. Error or break depending on hyphen-prefix
@@ -405,8 +406,9 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
             error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
                         NSLocalizedDescriptionKey: @"Unrecognized option",
                         @"option": token,
+                        @"possibilities": possibilities,
 #ifndef NDEBUG
-                        @"func": NSStringFromSelector(_cmd),
+                        @"file": @(__FILE__),
                         @"line": @(__LINE__),
 #endif
                     }];
