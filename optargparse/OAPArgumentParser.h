@@ -36,8 +36,13 @@ typedef NS_ENUM(NSInteger, OAPError) {
 // Negative until the first invocation of parseOptions:error:handler:
 @property (nonatomic) NSInteger argumentOffset;
 
+// matchPrefixes and fuzzyMatching control imprecise matching of arguments.
+// These properties are disabled when the session is not interactive.
+
 // Whether options should be matched based on unambiguous prefix matching (ie: --fo matches --foo unless --fou is also a possible match)
 @property (nonatomic) BOOL matchPrefixes;
+// Whether options should be matched based on levenshtein distance (ie: --comit matches --commit unless --comnit is also a possible match)
+@property (nonatomic) BOOL fuzzyMatching;
 
 // This method calls the handler for each matched option, or sets the error out-parameter. The boolean can be used in the absence of the error parameter to determine success.
 // Upon return, the argumentOffset property is advanced to the first unmatched argument, or the count of the arguments parameter if all arguments were consumed by parsing.

@@ -53,6 +53,51 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 @end
 @implementation OAPArgumentParser
 
++ (NSInteger) compare:(NSString *)stringA withString:(NSString *) stringB /*matchGain:(NSInteger)gain missingCost:(NSInteger)cost*/ {
+    NSInteger gain = 0;
+    NSInteger cost = 1;
+    NSInteger k, i, j, change, *d, distance;
+    NSUInteger n = [stringA length] + 1;
+    NSUInteger m = [stringB length] + 1;
+    
+    if (n == 1 || m == 1) { return 0; }
+
+    d = malloc(sizeof(NSInteger) * m * n);
+    
+    for( k = 0; k < n; k++)
+        d[k] = k;
+    
+    for( k = 0; k < m; k++)
+        d[ k * n ] = k;
+    
+    for (i = 1; i < n; i++) {
+        for (j = 1; j < m; j++) {
+            if ([stringA characterAtIndex:(i - 1)] == [stringB characterAtIndex:(j - 1)]) {
+                change = -gain;
+            } else {
+                change = cost;
+            }
+            
+            d[j * n + i] = MIN(d[(j - 1) * n + i] + 1, MIN(d[j * n + i - 1] + 1, d[(j - 1) * n + i - 1] + change));
+        }
+    }
+    
+    distance = d[n * m - 1];
+    free(d);
+    return distance;
+}
+
++ (NSSet<NSString *> *)matchesForParsedOptionName:(NSString *)parsedOptionName withOptions:(NSSet<NSString *> *)options heuristic:(BOOL(^)(NSString *token, NSString *option))heuristic {
+    NSMutableSet *result = [NSMutableSet set];
+    for (__strong NSString *option in options) {
+        option = sanitizedNameForOption(option);
+        if (heuristic(parsedOptionName, option)) {
+            [result addObject:option];
+        }
+    }
+    return result;
+}
+
 #pragma mark - Object creation
 
 + (instancetype)argumentParserWithArguments:(NSArray<NSString *> *)args {
@@ -85,18 +130,31 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
 // @property NSInteger argumentOffset;
 
+//
+// IMPRECISE OPTION MATCHING IS FOR INTERACTIVE SESSIONS ONLY!
+//
+// Prefix and fuzzy matching is great for human users, but non-interactive
+// sessions are forced to precisely match option names. The compatibility risks
+// of adding new options when scripts have been allowed to rely on imprecise
+// matching boggle the mind.
+//
+
 // @property BOOL matchPrefixes;
 @synthesize matchPrefixes = _matchPrefixes;
 - (void)setMatchPrefixes:(BOOL)matchPrefixes {
-    if (matchPrefixes == YES && !isatty(fileno(stdin))) {
-        /*
-         * Allowing scripts to use prefix matching introduces a class of binary
-         * compatibility concerns that should terrify any responsible tool
-         * author.
-         */
+    if (matchPrefixes && !isatty(fileno(stdin))) {
         matchPrefixes = NO;
     }
     self->_matchPrefixes = matchPrefixes;
+}
+
+// @property BOOL fuzzyMatching;
+@synthesize fuzzyMatching = _fuzzyMatching;
+- (void)setFuzzyMatching:(BOOL)fuzzyMatching {
+    if (fuzzyMatching && !isatty(fileno(stdin))) {
+        fuzzyMatching = NO;
+    }
+    self->_fuzzyMatching = fuzzyMatching;
 }
 
 #pragma mark - Parser
@@ -347,6 +405,8 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Prefix matching
         //
+
+
         // Duped code from parseToken:
         NSString *parsedOptionName = token;
         NSString *value = nil;
@@ -357,47 +417,49 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         }
         // End of duped code
 
-        NSLog(@"token: %@", token);
+        //
+        // Fuzzy matching!
+        //
+        NSString *fuzzyMatch = nil;
 
-        NSMutableSet *possibilities = [NSMutableSet new];
-        for (__strong NSString *option in options) {
-            option = sanitizedNameForOption(option);
-            if ([option hasPrefix:parsedOptionName]) {
-                [possibilities addObject:option];
+        //
+        // Prefix matching
+        //
+        NSSet<NSString *> *prefixMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *token, NSString *option) {
+            return [option hasPrefix:token];
+        }];
+        if (self->_matchPrefixes && prefixMatches.count == 1) {
+            fuzzyMatch = sanitizedNameForOption([prefixMatches anyObject]);
+            if (value != nil) {
+                // Expand the prefix using the complete option name
+                fuzzyMatch = [fuzzyMatch stringByAppendingFormat:@"=%@", value];
             }
         }
-        if (self->_matchPrefixes) {
-            if (possibilities.count == 1) {
-                NSString *option = [possibilities anyObject];
-                if (value != nil) {
-                    // Reconstitute the token using the complete option name
-                    option = [option stringByAppendingFormat:@"=%@", value];
-                }
-                _Bool success = parseToken(option);
-                NSAssert(success == true, @"How?");
-                if (error) {
-                    // Should not be possible
-                    break;
-                }
-                if (success) {
-                    continue;
-                }
-            } else if (possibilities.count > 1) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
-                            NSLocalizedDescriptionKey: @"Argument matches mutliple options",
-                            @"option": parsedOptionName,
-                            @"matches": [possibilities copy],
-#ifndef NDEBUG
-                            @"file": @(__FILE__),
-                            @"line": @(__LINE__),
-#endif
-                        }];
+
+        //
+        // Levenshtein matching
+        //
+        NSSet<NSString *> *levenshteinMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *token, NSString *option) {
+            return [[self class] compare:parsedOptionName withString:option] <= (option.length / 3);
+        }];
+        if (self->_fuzzyMatching && levenshteinMatches.count == 1) {
+            fuzzyMatch = sanitizedNameForOption([levenshteinMatches anyObject]);
+            if (value != nil) {
+                fuzzyMatch = [fuzzyMatch stringByAppendingFormat:@"=%@", value];
+            }
+        }
+
+        if (fuzzyMatch) {
+            _Bool success = parseToken(fuzzyMatch);
+            NSAssert(success == true, @"How?");
+            if (error) {
+                // Should not be possible
                 break;
             }
+            if (success) {
+                continue;
+            }
         }
-
-        // TODO: this would be a good place to apply a levenshtein distance calculation to see if the argument can be inferred
-        // For now, the error includes possibilities by prefix matching only
 
         //
         // Unrecognized option. Error or break depending on hyphen-prefix
@@ -406,7 +468,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
             error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
                         NSLocalizedDescriptionKey: @"Unrecognized option",
                         @"option": token,
-                        @"possibilities": possibilities,
+                        @"possibilities": [prefixMatches setByAddingObjectsFromSet:levenshteinMatches],
 #ifndef NDEBUG
                         @"file": @(__FILE__),
                         @"line": @(__LINE__),
