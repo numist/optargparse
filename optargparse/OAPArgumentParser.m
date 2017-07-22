@@ -102,6 +102,77 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     return result;
 }
 
++ (NSError *)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code file:(char *)file line:(int)line userInfo:(nullable NSDictionary<NSErrorUserInfoKey, id> *)dict {
+    NSMutableDictionary *userDict = [dict?:@{} mutableCopy];
+
+    assert(domain == OAPErrorDomain);
+
+//    NSLocalizedFailureErrorKey               Unrecognized option
+//    NSLocalizedFailureReasonErrorKey         Unrecognized option: --option
+//    NSLocalizedDescriptionKey                Parsing options failed: unrecognized option: --option
+//    NSLocalizedRecoverySuggestionErrorKey    Did you mean --option, --option, or --option?
+
+    NSString *failureError;                  // NSLocalizedFailureErrorKey
+    NSString *failureReasonError;            // NSLocalizedFailureReasonErrorKey
+    NSString *description;                   // NSLocalizedDescriptionKey
+    NSString *recoverySuggestionError = nil; // NSLocalizedRecoverySuggestionErrorKey
+
+    switch (code) {
+        case OAPInvalidOptionError:
+            failureError = @"Unrecognized option";
+#warning Export key symbols for magic strings @"option", @"parameter", @"possibilities", etc.
+            assert(userDict[@"option"]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            // TODO: This should use failureReasonError with the first char lowercased
+            description = [NSString stringWithFormat:@"Parsing options failed: unrecognized option: %@", userDict[@"option"]];
+            if (userDict[@"possibilities"]) {
+#warning TODO
+                recoverySuggestionError = @"";
+            }
+            break;
+
+        case OAPUnexpectedArgumentError:
+            failureError = @"Unexpected argument for option";
+            assert(userDict[@"option"]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            // TODO: This should use failureReasonError with the first char lowercased
+            description = [NSString stringWithFormat:@"Parsing options failed: unexpected argument for option: %@", userDict[@"option"]];
+            break;
+
+        case OAPMissingArgumentError:
+            failureError = @"Option requires an argument";
+            assert(userDict[@"option"]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            // TODO: This should use failureReasonError with the first char lowercased
+            description = [NSString stringWithFormat:@"Parsing options failed: option requires an argument: %@", userDict[@"option"]];
+            break;
+    }
+
+    if (@available(macOS 10.13, *)) {
+        if (!userDict[NSLocalizedFailureErrorKey] && failureError) {
+            userDict[NSLocalizedFailureErrorKey] = failureError;
+        }
+    }
+    if (!userDict[NSLocalizedFailureReasonErrorKey] && failureReasonError) {
+        userDict[NSLocalizedFailureReasonErrorKey] = failureReasonError;
+    }
+    if (!userDict[NSLocalizedDescriptionKey] && description) {
+        userDict[NSLocalizedDescriptionKey] = description;
+    }
+    if (!userDict[NSLocalizedRecoverySuggestionErrorKey] && recoverySuggestionError) {
+        userDict[NSLocalizedRecoverySuggestionErrorKey] = recoverySuggestionError;
+    }
+
+#ifndef NDEBUG
+    assert(file);
+    assert(line);
+    userDict[@"file"] = @(file);
+    userDict[@"line"] = @(line);
+#endif
+
+    return [NSError errorWithDomain:domain code:code userInfo:userDict];
+}
+
 #pragma mark - Object creation
 
 + (instancetype)argumentParserWithArguments:(NSArray<NSString *> *)args {
@@ -270,31 +341,25 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         
         // @":" is a valid flag for option definitions, but is not a valid character in the option name.
         if ([token hasSuffix:@":"]) {
-            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
-                        NSLocalizedDescriptionKey: @"Unrecognized option",
-                        @"option": token,
-#ifndef NDEBUG
-                        @"file": @(__FILE__),
-                        @"line": @(__LINE__),
-#endif
-                    }];
+            error = [[self class] errorWithDomain:OAPErrorDomain
+                                             code:OAPInvalidOptionError
+                                             file:__FILE__
+                                             line:__LINE__
+                                         userInfo:@{ @"option": token }];
             return (_Bool)false;
         }
         
         NSString *equalSuffixedOptionName = [parsedOptionName stringByAppendingString:@"="];
-        NSString *colonSuffixedOptionName = [token stringByAppendingString:@":"];
+        NSString *colonSuffixedOptionName = [parsedOptionName stringByAppendingString:@":"];
         
         // name=
         if ([options containsObject:equalSuffixedOptionName]) {
             if (value == nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{
-                            NSLocalizedDescriptionKey: @"Option requires an argument",
-                            @"option": parsedOptionName,
-#ifndef NDEBUG
-                            @"file": @(__FILE__),
-                            @"line": @(__LINE__),
-#endif
-                        }];
+                error = [[self class] errorWithDomain:OAPErrorDomain
+                                                 code:OAPMissingArgumentError
+                                                 file:__FILE__
+                                                 line:__LINE__
+                                             userInfo:@{ @"option": parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -306,14 +371,11 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // name
         if ([options containsObject:parsedOptionName]) {
             if (value != nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{
-                            NSLocalizedDescriptionKey: @"Unexpected argument for option",
-                            @"option": parsedOptionName,
-#ifndef NDEBUG
-                            @"file": @(__FILE__),
-                            @"line": @(__LINE__),
-#endif
-                        }];
+                error = [[self class] errorWithDomain:OAPErrorDomain
+                                                 code:OAPUnexpectedArgumentError
+                                                 file:__FILE__
+                                                 line:__LINE__
+                                             userInfo:@{ @"option": parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -325,26 +387,20 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // name:
         if ([options containsObject:colonSuffixedOptionName]) {
             if (value != nil) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPUnexpectedArgumentError userInfo:@{
-                            NSLocalizedDescriptionKey: @"Space-separated argument expected for option",
-                            @"option": parsedOptionName,
-#ifndef NDEBUG
-                            @"file": @(__FILE__),
-                            @"line": @(__LINE__),
-#endif
-                        }];
+                error = [[self class] errorWithDomain:OAPErrorDomain
+                                                 code:OAPUnexpectedArgumentError
+                                                 file:__FILE__
+                                                 line:__LINE__
+                                             userInfo:@{ @"option": parsedOptionName }];
                 return (_Bool)false;
             }
             
             if (argumentOffset + 1 >= arguments.count) {
-                error = [NSError errorWithDomain:OAPErrorDomain code:OAPMissingArgumentError userInfo:@{
-                            NSLocalizedDescriptionKey: @"Option requires an argument",
-                            @"option": parsedOptionName,
-#ifndef NDEBUG
-                            @"file": @(__FILE__),
-                            @"line": @(__LINE__),
-#endif
-                        }];
+                error = [[self class] errorWithDomain:OAPErrorDomain
+                                                 code:OAPMissingArgumentError
+                                                 file:__FILE__
+                                                 line:__LINE__
+                                             userInfo:@{ @"option": parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -473,15 +529,14 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         // Unrecognized option. Error or break depending on hyphen-prefix
         //
         if ([token hasPrefix:@"-"]) {
-            error = [NSError errorWithDomain:OAPErrorDomain code:OAPInvalidOptionError userInfo:@{
-                        NSLocalizedDescriptionKey: @"Unrecognized option",
-                        @"option": token,
-                        @"possibilities": [prefixMatches setByAddingObjectsFromSet:levenshteinMatches],
-#ifndef NDEBUG
-                        @"file": @(__FILE__),
-                        @"line": @(__LINE__),
-#endif
-                    }];
+            error = [[self class] errorWithDomain:OAPErrorDomain
+                                             code:OAPInvalidOptionError
+                                             file:__FILE__
+                                             line:__LINE__
+                                         userInfo:@{
+                                                    @"option": token,
+                                                    @"possibilities": [prefixMatches setByAddingObjectsFromSet:levenshteinMatches]
+                                                  }];
         }
         break;
     }

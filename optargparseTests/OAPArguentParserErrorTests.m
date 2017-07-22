@@ -66,17 +66,32 @@
 
 - (void)testNoCallbacksOnFailure {
     NSError *error;
-    __block _Bool once = true;
     OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--foo", @"--bar"]];
     XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
-        if (once) {
-            XCTFail(@"There should not be any callbacks when the parser fails");
-            once = false;
-        }
+        XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
     XCTAssertEqual(error.code, OAPInvalidOptionError);
 }
 
+- (void)testNoParamOptionFailsWithEquals {
+    NSError *error;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--foo=bar"]];
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        XCTFail(@"There should not be any callbacks when the parser fails");
+    }]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, OAPUnexpectedArgumentError);
+}
+
+- (void)testSpaceParamOptionFailsWithEquals {
+    NSError *error;
+    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--foo=bar"]];
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        XCTFail(@"There should not be any callbacks when the parser fails");
+    }]);
+    XCTAssertNotNil(error);
+    XCTAssertEqual(error.code, OAPUnexpectedArgumentError);
+}
 
 @end
