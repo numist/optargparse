@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, OAPError) {
 @interface OAPArgumentParser : NSObject
 
 #warning rename this to be shorter
-+ (instancetype)argumentParserWithArguments:(NSArray<NSString *> *)arguments;
++ (instancetype)parserWithArguments:(NSArray<NSString *> *)arguments;
 
 - (instancetype)init; // Create an instance using [[NSProcessInfo processInfo] arguments]
 - (instancetype)initWithArguments:(NSArray<NSString *> *)args; // Bring your own arguments

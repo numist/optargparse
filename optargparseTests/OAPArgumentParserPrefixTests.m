@@ -22,7 +22,7 @@
 
 - (void)testOptionPrefixMatching {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"st"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"st"]];
     parser.matchPrefixes = YES;
     XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTAssertEqualObjects(option, @"status");
@@ -33,7 +33,7 @@
 
 - (void)testOptionPrefixMatchingEqualsParameter {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--f=bar"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--f=bar"]];
     parser.matchPrefixes = YES;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo=", @"--bar"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTAssertEqualObjects(option, @"--foo");
@@ -45,7 +45,7 @@
 
 - (void)testOptionPrefixMatchingSpaceParameter {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--f", @"bar"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--f", @"bar"]];
     parser.matchPrefixes = YES;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTAssertEqualObjects(option, @"--foo");
@@ -57,7 +57,7 @@
 
 - (void)testOptionPrefixNotMatching {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"statuses"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"statuses"]];
     parser.matchPrefixes = YES;
     XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTFail();

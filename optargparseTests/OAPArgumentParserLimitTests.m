@@ -18,7 +18,7 @@
 - (void)testArgumentLimitConcatenationTarStyle {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
     parser.matchLimit = 1;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
@@ -31,7 +31,7 @@
 - (void)testArgumentLimitConcatenationTarStyleManyValues {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
     parser.matchLimit = 1;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
@@ -55,7 +55,7 @@
 - (void)testArgumentLimit {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-l", @"-h", @"-1", @"@", @"foo.tar", @"bar.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-l", @"-h", @"-1", @"@", @"foo.tar", @"bar.file"]];
     parser.matchLimit = 1;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
@@ -68,7 +68,7 @@
 - (void)testArgumentLimitWithParameter {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-l", @"foo.tar", @"-h", @"-1", @"@", @"bar.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-l", @"foo.tar", @"-h", @"-1", @"@", @"bar.file"]];
     parser.matchLimit = 1;
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l:", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;

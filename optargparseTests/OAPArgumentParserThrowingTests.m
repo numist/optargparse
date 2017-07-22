@@ -16,14 +16,14 @@
 @implementation OAPArgumentParserThrowingTests
 
 - (void)testInvalidOptionTrailingHyphen {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithObject:@"foo-"] error:nil handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
     }]);
 }
 
 - (void)testInvalidOptionArgAndNonArgIntroducingAmbiguity {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
 
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo:"])] error:nil handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
@@ -32,7 +32,7 @@
 }
 
 - (void)testInvalidOptionSnowman {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
 
     XCTAssertThrows([parser parseOptions:[NSSet setWithObject:@"☃"] error:nil handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
@@ -40,7 +40,7 @@
 }
 
 - (void)testInvalidOptionEmptyString {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
 
     XCTAssertThrows([parser parseOptions:[NSSet setWithObject:@""] error:nil handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
@@ -49,22 +49,22 @@
 
 - (void)testInvalidOptionThreeHyphens {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-foo", @"asdf"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-foo", @"asdf"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"---f:"])] error:&error handler:nil]);
 }
 
 - (void)testAmbiguousOptions {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"f", @"o"])] error:nil handler:nil]);
 }
 
 - (void)testAmbiguousHyphenOptions {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"-foo", @"-f", @"-o"])] error:nil handler:nil]);
 }
 
 - (void)testSingleCharacterOptionWithTwoHyphens {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"-foo", @"--f", @"--o"])] error:nil handler:nil]);
 }
 

@@ -16,14 +16,14 @@
 @implementation OAPArgumentParserTests
 
 - (void)testUnambiguousOptions {
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-foo"]];
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"--foo", @"-f", @"-o"])] error:nil handler:nil]);
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"-foo", @"--foo", @"f", @"o"])] error:nil handler:nil]);
 }
 
 - (void)testNoOptions {
     NSError *error;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--", @"foo"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
     XCTAssertTrue([parser parseOptions:[NSSet set] error:&error handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
     }]);
@@ -36,7 +36,7 @@
     NSError *theirError = nil;
     NSString *myOptionName = @"--foo";
     
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[myOptionName]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[myOptionName]];
     XCTAssertFalse([parser parseOptions:[NSSet setWithObject:myOptionName] error:&theirError handler:^(NSString *optionName, NSString *value, NSError **error) {
         XCTAssertEqualObjects(myOptionName, optionName);
         XCTAssertNil(value);
@@ -48,7 +48,7 @@
 - (void)testArgumentConcatenationTarStyle {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
     }]);
@@ -60,7 +60,7 @@
 - (void)testArgumentConcatenationTarStyleManyValues {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         handlerCalls += 1;
         if ([option isEqualToString:@"-x"]) {
@@ -83,7 +83,7 @@
 - (void)testArgumentConcatenationLsStyle {
     NSError *error;
     __block int handlerCalls = 0;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"-lh1@", @"foo.tar", @"bar.file"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-lh1@", @"foo.tar", @"bar.file"]];
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *parameter, NSError **error) {
         handlerCalls += 1;
     }]);
@@ -94,7 +94,7 @@
 
 - (void)testNoArguments {
     NSError *error = nil;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[]];
     XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:nil]);
     XCTAssertEqual(0, parser.argumentOffset);
     XCTAssertNil(error, @"Unexpected error: %@", error);

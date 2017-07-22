@@ -24,7 +24,7 @@
     NSError *error;
     __block BOOL didMatch = NO;
 
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[argument]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[argument]];
     parser.fuzzyMatching = YES;
     XCTAssertEqual(-1, parser.argumentOffset);
     XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *optionName, NSString *value, NSError **error) {
@@ -40,7 +40,7 @@
 - (void)levenshteinShouldNotMatch:(NSString *)argument {
     NSError *error;
 
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[argument]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[argument]];
     parser.fuzzyMatching = YES;
     XCTAssertEqual(-1, parser.argumentOffset);
     XCTAssertTrue([parser parseOptions:[[self gitCommands] setByAddingObject:@"checkoot"] error:&error handler:^(NSString *optionName, NSString *value, NSError **error) {
@@ -52,7 +52,7 @@
 - (void)testLevenshteinMatchWithParameter {
     NSError *error;
     __block BOOL didMatch = NO;
-    OAPArgumentParser *parser = [OAPArgumentParser argumentParserWithArguments:@[@"--something=flop"]];
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--something=flop"]];
     parser.fuzzyMatching = YES;
     XCTAssertTrue([parser parseOptions:[NSSet setWithObject:@"--somethang="] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
         XCTAssertEqualObjects(@"--somethang", option);

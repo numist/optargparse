@@ -178,7 +178,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
 #pragma mark - Object creation
 
-+ (instancetype)argumentParserWithArguments:(NSArray<NSString *> *)args {
++ (instancetype)parserWithArguments:(NSArray<NSString *> *)args {
     return [[self alloc] initWithArguments:args];
 }
 
