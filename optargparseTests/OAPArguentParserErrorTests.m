@@ -61,7 +61,7 @@
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
-    XCTAssertEqual(error.code, OAPMissingArgumentError);
+    XCTAssertEqual(error.code, OAPMissingParameterError);
 }
 
 - (void)testNoCallbacksOnFailure {
@@ -81,7 +81,7 @@
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
-    XCTAssertEqual(error.code, OAPUnexpectedArgumentError);
+    XCTAssertEqual(error.code, OAPUnexpectedParameterError);
 }
 
 - (void)testSpaceParamOptionFailsWithEquals {
@@ -91,7 +91,7 @@
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
-    XCTAssertEqual(error.code, OAPUnexpectedArgumentError);
+    XCTAssertEqual(error.code, OAPUnexpectedParameterError);
 }
 
 @end

@@ -123,28 +123,31 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 #warning Export key symbols for magic strings @"option", @"parameter", @"possibilities", etc.
             assert(userDict[@"option"]);
             failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
-            // TODO: This should use failureReasonError with the first char lowercased
-            description = [NSString stringWithFormat:@"Parsing options failed: unrecognized option: %@", userDict[@"option"]];
+            description = [NSString stringWithFormat:@"Parsing options failed: %@",
+                           [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
+                                                                       withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
             if (userDict[@"possibilities"]) {
 #warning TODO
                 recoverySuggestionError = @"";
             }
             break;
 
-        case OAPUnexpectedArgumentError:
-            failureError = @"Unexpected argument for option";
+        case OAPUnexpectedParameterError:
+            failureError = @"Unexpected parameter for option";
             assert(userDict[@"option"]);
             failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
-            // TODO: This should use failureReasonError with the first char lowercased
-            description = [NSString stringWithFormat:@"Parsing options failed: unexpected argument for option: %@", userDict[@"option"]];
+            description = [NSString stringWithFormat:@"Parsing options failed: %@",
+                           [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
+                                                                       withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
             break;
 
-        case OAPMissingArgumentError:
-            failureError = @"Option requires an argument";
+        case OAPMissingParameterError:
+            failureError = @"Option requires an parameter";
             assert(userDict[@"option"]);
             failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
-            // TODO: This should use failureReasonError with the first char lowercased
-            description = [NSString stringWithFormat:@"Parsing options failed: option requires an argument: %@", userDict[@"option"]];
+            description = [NSString stringWithFormat:@"Parsing options failed: %@",
+                           [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
+                                                                       withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
             break;
     }
 
@@ -236,7 +239,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
 static NSString *sanitizedNameForOption(NSString *option) {
     NSString *sanitizedName;
-    // @":" and @"=" denote whether an argument is expected and are not part of the argument's name
+    // @":" and @"=" denote whether a parameter is expected and are not part of the option's name
     if ([option hasSuffix:@":"]) {
         sanitizedName = [option substringToIndex:(option.length - 1)];
     } else if ([option hasSuffix:@"="]) {
@@ -262,7 +265,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
 
     for (NSString *name in options) {
         NSString *sanitizedName = sanitizedNameForOption(name);
-        // @":" and @"=" denote whether an argument is expected and are not part of the argument's name
+        // @":" and @"=" denote whether a parameter is expected and are not part of the option's name
         if ([name hasSuffix:@":"] && [options containsObject:sanitizedName]) {
             @throw [NSException exceptionWithName:NSInvalidArgumentException reason:@"Option combination introduces parsing ambiguity" userInfo:@{@"names" : @[name, sanitizedName]}];
         }
@@ -308,7 +311,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
     }
 }
 
-- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError **)pError handler:(void(^)(NSString *option,  NSString *_Nullable argument, NSError **error))handler {
+- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError **)pError handler:(void(^)(NSString *option,  NSString *_Nullable parameter, NSError **error))handler {
     __block NSError *error = nil;
     __OAPCallbackList *callbacks = [__OAPCallbackList new];
     
@@ -356,7 +359,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         if ([options containsObject:equalSuffixedOptionName]) {
             if (value == nil) {
                 error = [[self class] errorWithDomain:OAPErrorDomain
-                                                 code:OAPMissingArgumentError
+                                                 code:OAPMissingParameterError
                                                  file:__FILE__
                                                  line:__LINE__
                                              userInfo:@{ @"option": parsedOptionName }];
@@ -372,7 +375,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         if ([options containsObject:parsedOptionName]) {
             if (value != nil) {
                 error = [[self class] errorWithDomain:OAPErrorDomain
-                                                 code:OAPUnexpectedArgumentError
+                                                 code:OAPUnexpectedParameterError
                                                  file:__FILE__
                                                  line:__LINE__
                                              userInfo:@{ @"option": parsedOptionName }];
@@ -388,7 +391,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         if ([options containsObject:colonSuffixedOptionName]) {
             if (value != nil) {
                 error = [[self class] errorWithDomain:OAPErrorDomain
-                                                 code:OAPUnexpectedArgumentError
+                                                 code:OAPUnexpectedParameterError
                                                  file:__FILE__
                                                  line:__LINE__
                                              userInfo:@{ @"option": parsedOptionName }];
@@ -397,7 +400,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
             
             if (argumentOffset + 1 >= arguments.count) {
                 error = [[self class] errorWithDomain:OAPErrorDomain
-                                                 code:OAPMissingArgumentError
+                                                 code:OAPMissingParameterError
                                                  file:__FILE__
                                                  line:__LINE__
                                              userInfo:@{ @"option": parsedOptionName }];

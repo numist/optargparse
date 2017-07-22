@@ -18,13 +18,14 @@ extern NSErrorDomain const OAPErrorDomain;
 
 typedef NS_ENUM(NSInteger, OAPError) {
     OAPInvalidOptionError,
-    OAPUnexpectedArgumentError,
-    OAPMissingArgumentError,
+    OAPUnexpectedParameterError,
+    OAPMissingParameterError,
 };
 
 
 @interface OAPArgumentParser : NSObject
 
+#warning rename this to be shorter
 + (instancetype)argumentParserWithArguments:(NSArray<NSString *> *)arguments;
 
 - (instancetype)init; // Create an instance using [[NSProcessInfo processInfo] arguments]
