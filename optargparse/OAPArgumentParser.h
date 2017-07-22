@@ -20,6 +20,7 @@ typedef NS_ENUM(NSInteger, OAPError) {
     OAPInvalidOptionError,
     OAPUnexpectedParameterError,
     OAPMissingParameterError,
+#warning add a user-defined error type
 };
 
 
