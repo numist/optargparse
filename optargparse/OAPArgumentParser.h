@@ -25,6 +25,16 @@ typedef NS_ENUM(NSInteger, OAPError) {
 
 
 @interface OAPArgumentParser : NSObject
+#ifndef __OBJC2__
+{
+    NSArray<NSString *> *_arguments;
+    NSInteger _argumentOffset;
+    NSUInteger _matchLimit;
+    BOOL _matchPrefixes;
+    BOOL _fuzzyMatching;
+    BOOL _usesProcessArguments;
+}
+#endif
 
 #warning rename this to be shorter
 + (instancetype)parserWithArguments:(NSArray<NSString *> *)arguments;

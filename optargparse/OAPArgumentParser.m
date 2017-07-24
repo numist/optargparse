@@ -11,14 +11,12 @@
 NSErrorDomain const OAPErrorDomain = @"OAPErrorDomain";
 
 
-@interface __OAPCallbackList : NSObject
+@interface __OAPCallbackList : NSObject {
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *_callbacks;
+}
 - (NSUInteger)count;
 - (void)addCallbackWithName:(NSString *)name value:(NSString *)value;
 - (NSError *)deliverCallbacksToHandler:(void(^)(NSString *option,  NSString *_Nullable argument, NSError **error))handler;
-@end
-@interface __OAPCallbackList () {
-    NSMutableArray<NSDictionary<NSString *, NSString *> *> *_callbacks;
-}
 @end
 static const NSString *__OAPCallbackListOptionNameKey = @"__OAPCallbackListOptionNameKey";
 static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOptionValueKey";
@@ -207,6 +205,9 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 }
 
 // @property NSInteger argumentOffset;
+@synthesize argumentOffset = _argumentOffset;
+
+@synthesize usesProcessArguments = _usesProcessArguments;
 
 //
 // IMPRECISE OPTION MATCHING IS FOR INTERACTIVE SESSIONS ONLY!
