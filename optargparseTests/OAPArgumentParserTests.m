@@ -2,8 +2,7 @@
 //  OAPArgumentParserTests.m
 //  optargparse
 //
-//  Created by Scott Perry on 2/21/17.
-//  Copyright © 2017 Scott Perry. All rights reserved.
+//  Public domain
 //
 
 #import <XCTest/XCTest.h>

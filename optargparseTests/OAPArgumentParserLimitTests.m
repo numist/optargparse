@@ -2,8 +2,7 @@
 //  OAPArgumentParserLimitTests.m
 //  optargparseTests
 //
-//  Created by numist on 2017-07-21.
-//  Copyright © 2017 Scott Perry. All rights reserved.
+//  Public domain
 //
 
 #import <XCTest/XCTest.h>
