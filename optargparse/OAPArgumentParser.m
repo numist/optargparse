@@ -62,7 +62,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     NSUInteger n = [stringA length] + 1;
     NSUInteger m = [stringB length] + 1;
     
-    if (n == 1 || m == 1) { return 0; }
+    assert(n > 1 && m > 1);
 
     d = malloc(sizeof(NSInteger) * m * n);
     

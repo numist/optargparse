@@ -99,4 +99,16 @@
     XCTAssertNil(error, @"Unexpected error: %@", error);
 }
 
+- (void)testMultipleEquals {
+    NSError *error = nil;
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo=bar=baz"]];
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo="])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        XCTAssertEqualObjects(option, @"--foo");
+        XCTAssertEqualObjects(argument, @"bar=baz");
+        XCTAssertNil(*error);
+    }]);
+    XCTAssertEqual(parser.arguments.count, parser.argumentOffset);
+    XCTAssertNil(error, @"Unexpected error: %@", error);
+}
+
 @end
