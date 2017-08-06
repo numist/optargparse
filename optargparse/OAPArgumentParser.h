@@ -20,7 +20,6 @@ typedef NS_ENUM(NSInteger, OAPError) {
     OAPInvalidOptionError,
     OAPUnexpectedParameterError,
     OAPMissingParameterError,
-#warning add a user-defined error type
 };
 
 
@@ -36,7 +35,6 @@ typedef NS_ENUM(NSInteger, OAPError) {
 }
 #endif
 
-#warning rename this to be shorter
 + (instancetype)parserWithArguments:(NSArray<NSString *> *)arguments;
 
 - (instancetype)init; // Create an instance using [[NSProcessInfo processInfo] arguments]
