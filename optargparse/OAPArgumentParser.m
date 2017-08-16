@@ -100,7 +100,11 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     return result;
 }
 
+#if MAC_OS_X_VERSION_10_13 > 0
 + (NSError *)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code file:(char *)file line:(int)line userInfo:(nullable NSDictionary<NSErrorUserInfoKey, id> *)dict {
+#else
++ (NSError *)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code file:(char *)file line:(int)line userInfo:(nullable NSDictionary<NSString *, id> *)dict {
+#endif //#if MAC_OS_X_VERSION_10_13 > 0
     NSMutableDictionary *userDict = [dict?:@{} mutableCopy];
 
     assert(domain == OAPErrorDomain);
@@ -149,11 +153,13 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
             break;
     }
 
+#if MAC_OS_X_VERSION_10_13 > 0
     if (@available(macOS 10.13, *)) {
         if (!userDict[NSLocalizedFailureErrorKey] && failureError) {
             userDict[NSLocalizedFailureErrorKey] = failureError;
         }
     }
+#endif //#if MAC_OS_X_VERSION_10_13 > 0
     if (!userDict[NSLocalizedFailureReasonErrorKey] && failureReasonError) {
         userDict[NSLocalizedFailureReasonErrorKey] = failureReasonError;
     }
