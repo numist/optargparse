@@ -14,6 +14,15 @@
 
 @implementation OAPArgumentParserTests
 
+- (void)testConstants {
+    XCTAssertTrue([OAPErrorDomain isEqualToString:@"OAPErrorDomain"]);
+    XCTAssertTrue([OAPErrorOptionKey isEqualToString:@"option"]);
+    XCTAssertTrue([OAPErrorPossibilitiesKey isEqualToString:@"possibilities"]);
+    XCTAssertTrue([OAPErrorParameterKey isEqualToString:@"parameter"]);
+    XCTAssertTrue([OAPErrorFileKey isEqualToString:@"file"]);
+    XCTAssertTrue([OAPErrorLineKey isEqualToString:@"line"]);
+}
+
 - (void)testUnambiguousOptions {
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-foo"]];
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"--foo", @"-f", @"-o"])] error:nil handler:nil]);

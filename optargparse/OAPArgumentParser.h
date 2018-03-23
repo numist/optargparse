@@ -15,12 +15,16 @@ NS_ASSUME_NONNULL_BEGIN
 // Argument: Tokens from the command line. "ls" "-al" "--foo bar" "--go=far" are all arguments
 
 extern NSErrorDomain const OAPErrorDomain;
+extern NSString * const OAPErrorOptionKey;
+extern NSString * const OAPErrorPossibilitiesKey;
+extern NSString * const OAPErrorParameterKey;
+extern NSString * const OAPErrorFileKey;
+extern NSString * const OAPErrorLineKey;
 
 typedef NS_ENUM(NSInteger, OAPError) {
     OAPInvalidOptionError,
     OAPUnexpectedParameterError,
     OAPMissingParameterError,
-#warning add a user-defined error type
 };
 
 
@@ -36,7 +40,6 @@ typedef NS_ENUM(NSInteger, OAPError) {
 }
 #endif
 
-#warning rename this to be shorter
 + (instancetype)parserWithArguments:(NSArray<NSString *> *)arguments;
 
 - (instancetype)init; // Create an instance using [[NSProcessInfo processInfo] arguments]
