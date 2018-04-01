@@ -65,6 +65,22 @@
     XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
 }
 
+- (void)testArgumentXcodebuildStyle {
+    NSError *error = nil;
+    __block int handlerCalls = 0;
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-project", @"SampleProject.xcodeproj", @"-scheme", @"Scheme"]];
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-project:", @"-scheme:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        handlerCalls += 1;
+        if ([option isEqualToString:@"-scheme"]) {
+            XCTAssertTrue([argument isEqualToString:@"Scheme"]);
+        } else if ([option isEqualToString:@"-project"]) {
+            XCTAssertTrue([argument isEqualToString:@"SampleProject.xcodeproj"]);
+        }
+    }]);
+    XCTAssertEqual(handlerCalls, 2);
+    XCTAssertNil(error, @"Unexpected error: %@", error);
+}
+
 - (void)testArgumentConcatenationTarStyleManyValues {
     NSError *error;
     __block int handlerCalls = 0;
