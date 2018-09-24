@@ -15,6 +15,11 @@ NS_ASSUME_NONNULL_BEGIN
 // Argument: Tokens from the command line. "ls" "-al" "--foo bar" "--go=far" are all arguments
 
 extern NSErrorDomain const OAPErrorDomain;
+extern NSString * const OAPErrorOptionKey;
+extern NSString * const OAPErrorPossibilitiesKey;
+extern NSString * const OAPErrorParameterKey;
+extern NSString * const OAPErrorFileKey;
+extern NSString * const OAPErrorLineKey;
 
 typedef NS_ENUM(NSInteger, OAPError) {
     OAPInvalidOptionError,

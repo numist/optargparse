@@ -9,7 +9,11 @@
 
 
 NSErrorDomain const OAPErrorDomain = @"OAPErrorDomain";
-
+NSString * const OAPErrorOptionKey = @"option";
+NSString * const OAPErrorPossibilitiesKey = @"possibilities";
+NSString * const OAPErrorParameterKey = @"parameter";
+NSString * const OAPErrorFileKey = @"file";
+NSString * const OAPErrorLineKey = @"line";
 
 @interface __OAPCallbackList : NSObject {
     NSMutableArray<NSDictionary<NSString *, NSString *> *> *_callbacks;
@@ -122,22 +126,20 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     switch (code) {
         case OAPInvalidOptionError:
             failureError = @"Unrecognized option";
-#warning Export key symbols for magic strings @"option", @"parameter", @"possibilities", etc.
-            assert(userDict[@"option"]);
-            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            assert(userDict[OAPErrorOptionKey]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[OAPErrorOptionKey]];
             description = [NSString stringWithFormat:@"Parsing options failed: %@",
                            [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
                                                                        withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
-            if (userDict[@"possibilities"]) {
-#warning TODO
-                recoverySuggestionError = @"";
+            if ([userDict[OAPErrorPossibilitiesKey] count] > 0) {
+                recoverySuggestionError = [NSString stringWithFormat:@"Valid options: %@", [[userDict[OAPErrorPossibilitiesKey] allObjects] componentsJoinedByString:@", "]];
             }
             break;
 
         case OAPUnexpectedParameterError:
             failureError = @"Unexpected parameter for option";
-            assert(userDict[@"option"]);
-            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            assert(userDict[OAPErrorOptionKey]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[OAPErrorOptionKey]];
             description = [NSString stringWithFormat:@"Parsing options failed: %@",
                            [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
                                                                        withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
@@ -145,8 +147,8 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
         case OAPMissingParameterError:
             failureError = @"Option requires an parameter";
-            assert(userDict[@"option"]);
-            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[@"option"]];
+            assert(userDict[OAPErrorOptionKey]);
+            failureReasonError = [NSString stringWithFormat:@"%@: %@", failureError, userDict[OAPErrorOptionKey]];
             description = [NSString stringWithFormat:@"Parsing options failed: %@",
                            [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
                                                                        withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
@@ -173,8 +175,8 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 #ifndef NDEBUG
     assert(file);
     assert(line);
-    userDict[@"file"] = @(file);
-    userDict[@"line"] = @(line);
+    userDict[OAPErrorFileKey] = @(file);
+    userDict[OAPErrorLineKey] = @(line);
 #endif
 
     return [NSError errorWithDomain:domain code:code userInfo:userDict];
@@ -355,7 +357,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                              code:OAPInvalidOptionError
                                              file:__FILE__
                                              line:__LINE__
-                                         userInfo:@{ @"option": token }];
+                                         userInfo:@{ OAPErrorOptionKey: token }];
             return (_Bool)false;
         }
         
@@ -369,7 +371,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                                  code:OAPMissingParameterError
                                                  file:__FILE__
                                                  line:__LINE__
-                                             userInfo:@{ @"option": parsedOptionName }];
+                                             userInfo:@{ OAPErrorOptionKey: parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -385,7 +387,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                                  code:OAPUnexpectedParameterError
                                                  file:__FILE__
                                                  line:__LINE__
-                                             userInfo:@{ @"option": parsedOptionName }];
+                                             userInfo:@{ OAPErrorOptionKey: parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -401,7 +403,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                                  code:OAPUnexpectedParameterError
                                                  file:__FILE__
                                                  line:__LINE__
-                                             userInfo:@{ @"option": parsedOptionName }];
+                                             userInfo:@{ OAPErrorOptionKey: parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -410,7 +412,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                                  code:OAPMissingParameterError
                                                  file:__FILE__
                                                  line:__LINE__
-                                             userInfo:@{ @"option": parsedOptionName }];
+                                             userInfo:@{ OAPErrorOptionKey: parsedOptionName }];
                 return (_Bool)false;
             }
             
@@ -544,8 +546,8 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                                              file:__FILE__
                                              line:__LINE__
                                          userInfo:@{
-                                                    @"option": token,
-                                                    @"possibilities": [prefixMatches setByAddingObjectsFromSet:levenshteinMatches]
+                                                    OAPErrorOptionKey: token,
+                                                    OAPErrorPossibilitiesKey: [prefixMatches setByAddingObjectsFromSet:levenshteinMatches]
                                                   }];
         }
         break;

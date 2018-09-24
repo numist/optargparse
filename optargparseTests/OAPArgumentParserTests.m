@@ -14,6 +14,15 @@
 
 @implementation OAPArgumentParserTests
 
+- (void)testConstants {
+    XCTAssertTrue([OAPErrorDomain isEqualToString:@"OAPErrorDomain"]);
+    XCTAssertTrue([OAPErrorOptionKey isEqualToString:@"option"]);
+    XCTAssertTrue([OAPErrorPossibilitiesKey isEqualToString:@"possibilities"]);
+    XCTAssertTrue([OAPErrorParameterKey isEqualToString:@"parameter"]);
+    XCTAssertTrue([OAPErrorFileKey isEqualToString:@"file"]);
+    XCTAssertTrue([OAPErrorLineKey isEqualToString:@"line"]);
+}
+
 - (void)testUnambiguousOptions {
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-foo"]];
     XCTAssertNoThrow([parser parseOptions:[NSSet setWithArray:(@[@"foo", @"--foo", @"-f", @"-o"])] error:nil handler:nil]);
@@ -54,6 +63,22 @@
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
     XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
+}
+
+- (void)testArgumentXcodebuildStyle {
+    NSError *error = nil;
+    __block int handlerCalls = 0;
+    OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-project", @"SampleProject.xcodeproj", @"-scheme", @"Scheme"]];
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-project:", @"-scheme:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+        handlerCalls += 1;
+        if ([option isEqualToString:@"-scheme"]) {
+            XCTAssertTrue([argument isEqualToString:@"Scheme"]);
+        } else if ([option isEqualToString:@"-project"]) {
+            XCTAssertTrue([argument isEqualToString:@"SampleProject.xcodeproj"]);
+        }
+    }]);
+    XCTAssertEqual(handlerCalls, 2);
+    XCTAssertNil(error, @"Unexpected error: %@", error);
 }
 
 - (void)testArgumentConcatenationTarStyleManyValues {

@@ -20,4 +20,12 @@ xcuserdata/
 ## Other
 *.moved-aside
 *.xccheckout
+*.xcuserstate
 *.xcscmblueprint
+
+## Obj-C/Swift specific
+*.hmap
+*.ipa
+
+## OSX
+*.DS_Store
