@@ -23,7 +23,7 @@
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"st"]];
     parser.matchPrefixes = YES;
-    XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTAssertEqualObjects(option, @"status");
     }]);
     XCTAssertNil(error);
@@ -34,7 +34,7 @@
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--f=bar"]];
     parser.matchPrefixes = YES;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo=", @"--bar"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo=", @"--bar"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTAssertEqualObjects(option, @"--foo");
         XCTAssertEqualObjects(argument, @"bar");
     }]);
@@ -46,7 +46,7 @@
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--f", @"bar"]];
     parser.matchPrefixes = YES;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTAssertEqualObjects(option, @"--foo");
         XCTAssertEqualObjects(argument, @"bar");
     }]);
@@ -58,7 +58,7 @@
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"statuses"]];
     parser.matchPrefixes = YES;
-    XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail();
     }]);
     XCTAssertNil(error);

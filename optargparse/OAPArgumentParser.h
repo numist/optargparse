@@ -64,7 +64,7 @@ typedef NS_ENUM(NSInteger, OAPError) {
 
 // This method calls the handler for each matched option, or sets the error out-parameter. The boolean can be used in the absence of the error parameter to determine success.
 // Upon return, the argumentOffset property is advanced to the first unmatched argument, or the count of the arguments parameter if all arguments were consumed by parsing.
-- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError **)error handler:(nullable void(^)(NSString *option,  NSString *_Nullable argument, NSError **error))handler;
+- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError * _Nullable __autoreleasing * _Nullable)pError handler:(nullable void(^)(NSString *option,  NSString * _Nullable parameter, NSError * _Nullable __autoreleasing * _Nullable error))handler;
 
 @end
 

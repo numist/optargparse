@@ -32,11 +32,11 @@
 - (void)testNoOptions {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--", @"foo"]];
-    XCTAssertTrue([parser parseOptions:[NSSet set] error:&error handler:^(NSString *name, NSString *value, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet set] error:&error handler:^(NSString *name, NSString *value, NSError **outError) {
         XCTFail(@"Parser should not have reported any options");
     }]);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"foo");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"foo");
 }
 
 - (void)testUserErrorGetsPropagated {
@@ -57,19 +57,19 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"bar.file");
 }
 
 - (void)testArgumentXcodebuildStyle {
     NSError *error = nil;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-project", @"SampleProject.xcodeproj", @"-scheme", @"Scheme"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-project:", @"-scheme:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-project:", @"-scheme:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
         if ([option isEqualToString:@"-scheme"]) {
             XCTAssertTrue([argument isEqualToString:@"Scheme"]);
@@ -85,7 +85,7 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
         if ([option isEqualToString:@"-x"]) {
             XCTAssertEqualObjects(argument, @"foo.tar");
@@ -108,12 +108,12 @@
     NSError *error;
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-lh1@", @"foo.tar", @"bar.file"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *parameter, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *parameter, NSError **outError) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"foo.tar");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"foo.tar");
 }
 
 - (void)testNoArguments {
@@ -127,12 +127,12 @@
 - (void)testMultipleEquals {
     NSError *error = nil;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo=bar=baz"]];
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo="])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"--foo="])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTAssertEqualObjects(option, @"--foo");
         XCTAssertEqualObjects(argument, @"bar=baz");
-        XCTAssertNil(*error);
+        XCTAssertNil(*outError);
     }]);
-    XCTAssertEqual(parser.arguments.count, parser.argumentOffset);
+    XCTAssertEqual(parser.arguments.count, (NSUInteger)parser.argumentOffset);
     XCTAssertNil(error, @"Unexpected error: %@", error);
 }
 

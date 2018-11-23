@@ -19,12 +19,13 @@
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"xzvf", @"foo.tar", @"bar.file"]];
     parser.matchLimit = 1;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"bar.file");
+    XCTAssertNil(error);
 }
 
 - (void)testArgumentLimitConcatenationTarStyleManyValues {
@@ -32,7 +33,7 @@
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-xzvf", @"foo.tar", @"bar.file", @"qux.file"]];
     parser.matchLimit = 1;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-x:", @"-z:", @"-v", @"-f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
         if ([option isEqualToString:@"-x"]) {
             XCTAssertEqualObjects(argument, @"foo.tar");
@@ -49,6 +50,7 @@
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
     XCTAssertEqual(4, parser.argumentOffset);
+    XCTAssertNil(error);
 }
 
 - (void)testArgumentLimit {
@@ -56,12 +58,13 @@
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-l", @"-h", @"-1", @"@", @"foo.tar", @"bar.file"]];
     parser.matchLimit = 1;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 1);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"-h");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"-h");
+    XCTAssertNil(error);
 }
 
 - (void)testArgumentLimitWithParameter {
@@ -69,12 +72,13 @@
     __block int handlerCalls = 0;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-l", @"foo.tar", @"-h", @"-1", @"@", @"bar.file"]];
     parser.matchLimit = 1;
-    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l:", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertTrue([parser parseOptions:[NSSet setWithArray:(@[@"-l:", @"-h", @"-1", @"-@"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         handlerCalls += 1;
     }]);
     XCTAssertEqual(handlerCalls, 1);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"-h");
+    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"-h");
+    XCTAssertNil(error);
 }
 
 @end
