@@ -36,7 +36,7 @@
         XCTFail(@"Parser should not have reported any options");
     }]);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"foo");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"foo");
 }
 
 - (void)testUserErrorGetsPropagated {
@@ -62,7 +62,7 @@
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"bar.file");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
 }
 
 - (void)testArgumentXcodebuildStyle {
@@ -113,7 +113,7 @@
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"foo.tar");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"foo.tar");
 }
 
 - (void)testNoArguments {
@@ -132,7 +132,7 @@
         XCTAssertEqualObjects(argument, @"bar=baz");
         XCTAssertNil(*outError);
     }]);
-    XCTAssertEqual(parser.arguments.count, (NSUInteger)parser.argumentOffset);
+    XCTAssertEqual(parser.arguments.count, parser.argumentOffset);
     XCTAssertNil(error, @"Unexpected error: %@", error);
 }
 

@@ -25,7 +25,7 @@
 
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[argument]];
     parser.fuzzyMatching = YES;
-    XCTAssertEqual(-1, parser.argumentOffset);
+    XCTAssertEqual(NSUIntegerMax, parser.argumentOffset);
     XCTAssertTrue([parser parseOptions:[self gitCommands] error:&error handler:^(NSString *optionName, NSString *value, NSError **outError) {
         XCTAssertEqualObjects(optionName, option);
         XCTAssertNil(*outError);
@@ -42,7 +42,7 @@
 
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[argument]];
     parser.fuzzyMatching = YES;
-    XCTAssertEqual(-1, parser.argumentOffset);
+    XCTAssertEqual(NSUIntegerMax, parser.argumentOffset);
     XCTAssertTrue([parser parseOptions:[[self gitCommands] setByAddingObject:@"checkoot"] error:&error handler:^(NSString *optionName, NSString *value, NSError **outError) {
         XCTFail();
     }]);

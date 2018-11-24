@@ -203,7 +203,7 @@ NSString * const __OAPCallbackListOptionValueKey = @"__OAPCallbackListOptionValu
     if (!(self = [super init])) { return nil; }
     
     self->_arguments = [args copy];
-    self->_argumentOffset = -1;
+    self->_argumentOffset = NSUIntegerMax;
     
     return self;
 }
@@ -332,13 +332,13 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         return YES;
     }
     
-    if (self->_argumentOffset < 0) {
+    if (self->_argumentOffset == NSUIntegerMax) {
         self->_argumentOffset = self->_usesProcessArguments ? 1 : 0;
     }
     
     optionValidator(self, options);
     
-    __block NSInteger argumentOffset = self->_argumentOffset;
+    __block NSUInteger argumentOffset = self->_argumentOffset;
     __block NSArray<NSString *> *arguments = self->_arguments;
 
     //
@@ -410,7 +410,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
                 return (_Bool)false;
             }
             
-            if (argumentOffset + 1 >= (NSInteger)arguments.count) {
+            if (argumentOffset + 1 >= arguments.count) {
                 error = [[self class] errorWithDomain:OAPErrorDomain
                                                  code:OAPMissingParameterError
                                                  file:__FILE__
@@ -420,7 +420,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
             }
             
             argumentOffset += 1; // account for the consumed token used as this option's argument.
-            [callbacks addCallbackWithName:parsedOptionName value:arguments[(NSUInteger)argumentOffset]];
+            [callbacks addCallbackWithName:parsedOptionName value:arguments[argumentOffset]];
             argumentOffset += 1;
             return (_Bool)true;
         }
@@ -428,12 +428,12 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         return (_Bool)false;
     };
 
-    while (argumentOffset < (NSInteger)arguments.count && error == nil) {
+    while (argumentOffset < arguments.count && error == nil) {
         if (self->_matchLimit > 0 && callbacks.count >= self->_matchLimit) {
             break;
         }
 
-        NSString *token = arguments[(NSUInteger)argumentOffset];
+        NSString *token = arguments[argumentOffset];
         
         //
         // Parsing arguments always ends on a loose @"--" token
@@ -452,7 +452,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Concatenated single-char options
         //
-        const NSInteger prevArgumentOffset = argumentOffset;
+        const NSUInteger prevArgumentOffset = argumentOffset;
         _Bool hasHyphen = false;
         NSUInteger i;
         for (i = 0; i < token.length; i++) {

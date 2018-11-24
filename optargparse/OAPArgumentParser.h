@@ -49,7 +49,7 @@ typedef NS_ENUM(NSInteger, OAPError) {
 
 // Where to begin parsing on the next call to parseOptions:error:handler:
 // Negative until the first invocation of parseOptions:error:handler:
-@property (nonatomic) NSInteger argumentOffset;
+@property (nonatomic) NSUInteger argumentOffset;
 
 // The number of matches to process before exiting. 0 for all (default).
 @property (nonatomic) NSUInteger matchLimit;

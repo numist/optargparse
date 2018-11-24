@@ -24,7 +24,7 @@
     }]);
     XCTAssertEqual(handlerCalls, 4);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"bar.file");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"bar.file");
     XCTAssertNil(error);
 }
 
@@ -63,7 +63,7 @@
     }]);
     XCTAssertEqual(handlerCalls, 1);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"-h");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"-h");
     XCTAssertNil(error);
 }
 
@@ -77,7 +77,7 @@
     }]);
     XCTAssertEqual(handlerCalls, 1);
     XCTAssertNil(error, @"Unexpected error: %@", error);
-    XCTAssertEqualObjects(parser.arguments[(NSUInteger)parser.argumentOffset], @"-h");
+    XCTAssertEqualObjects(parser.arguments[parser.argumentOffset], @"-h");
     XCTAssertNil(error);
 }
 
