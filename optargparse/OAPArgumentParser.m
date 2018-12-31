@@ -6,7 +6,7 @@
 //
 
 #import "OAPArgumentParser.h"
-
+#import <Foundation/Foundation.h>
 
 NSErrorDomain const OAPErrorDomain = @"OAPErrorDomain";
 NSString * const OAPErrorOptionKey = @"option";

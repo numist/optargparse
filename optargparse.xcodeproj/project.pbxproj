@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		BC56A59E1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC56A59D1F22BCBB002F7839 /* OAPArgumentParserLimitTests.m */; };
 		BC74E5931E5BF49B00E717C9 /* liboptargparse.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BC74E57E1E5BF48E00E717C9 /* liboptargparse.a */; };
-		BC74E59B1E5BF4D600E717C9 /* OAPArgumentParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */; };
+		BC74E59B1E5BF4D600E717C9 /* OAPArgumentParser.h in Headers */ = {isa = PBXBuildFile; fileRef = BC74E5991E5BF4D600E717C9 /* OAPArgumentParser.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		BC74E59C1E5BF4D600E717C9 /* OAPArgumentParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E59A1E5BF4D600E717C9 /* OAPArgumentParser.m */; };
 		BC74E5A91E5C2C1C00E717C9 /* OAPArgumentParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BC74E5A81E5C2C1C00E717C9 /* OAPArgumentParserTests.m */; };
 		BCD15A641F21AF4300E475C4 /* OAPArgumentParserLevenshteinTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BCD15A631F21AF4300E475C4 /* OAPArgumentParserLevenshteinTests.m */; };
@@ -120,9 +120,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BC74E5871E5BF48E00E717C9 /* Build configuration list for PBXNativeTarget "optargparse" */;
 			buildPhases = (
+				BC74E57C1E5BF48E00E717C9 /* Headers */,
 				BC74E57A1E5BF48E00E717C9 /* Sources */,
 				BC74E57B1E5BF48E00E717C9 /* Frameworks */,
-				BC74E57C1E5BF48E00E717C9 /* Headers */,
 			);
 			buildRules = (
 			);
@@ -406,7 +406,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				PRIVATE_HEADERS_FOLDER_PATH = "/usr/local/include/$(PROJECT_NAME)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "/usr/local/include/$(PROJECT_NAME)";
 			};
 			name = Debug;
 		};
@@ -414,7 +416,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				EXECUTABLE_PREFIX = lib;
+				PRIVATE_HEADERS_FOLDER_PATH = "/usr/local/include/$(PROJECT_NAME)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PUBLIC_HEADERS_FOLDER_PATH = "/usr/local/include/$(PROJECT_NAME)";
 			};
 			name = Release;
 		};

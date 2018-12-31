@@ -5,7 +5,9 @@
 //  Public domain
 //
 
-#import <Foundation/Foundation.h>
+#import <Foundation/NSString.h>
+#import <Foundation/NSError.h>
+#import <Foundation/NSArray.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
