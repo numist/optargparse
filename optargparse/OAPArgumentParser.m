@@ -113,7 +113,7 @@ NSString * const __OAPCallbackListOptionValueKey = @"__OAPCallbackListOptionValu
 #else
 + (NSError *)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code file:(char *)file line:(int)line userInfo:(nullable NSDictionary<NSString *, id> *)dict {
 #endif //#if MAC_OS_X_VERSION_10_13 > 0
-    NSMutableDictionary *userDict = [dict?:@{} mutableCopy];
+    NSMutableDictionary *userDict = [(dict ? dict : @{}) mutableCopy];
 
     assert(domain == OAPErrorDomain);
 
