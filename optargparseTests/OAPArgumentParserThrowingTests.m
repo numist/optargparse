@@ -26,7 +26,9 @@
 
     XCTAssertThrows([parser parseOptions:[NSSet setWithArray:(@[@"--foo", @"--foo:"])] error:nil handler:^(NSString *name, NSString *value, NSError **error) {
         XCTFail(@"Parser should not have reported any options");
-        *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:nil];
+        if (error) {
+            *error = [NSError errorWithDomain:NSCocoaErrorDomain code:0 userInfo:nil];
+        }
     }]);
 }
 

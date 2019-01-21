@@ -6,7 +6,7 @@
 //
 
 #import "OAPArgumentParser.h"
-
+#import <Foundation/Foundation.h>
 
 NSErrorDomain const OAPErrorDomain = @"OAPErrorDomain";
 NSString * const OAPErrorOptionKey = @"option";
@@ -15,15 +15,17 @@ NSString * const OAPErrorParameterKey = @"parameter";
 NSString * const OAPErrorFileKey = @"file";
 NSString * const OAPErrorLineKey = @"line";
 
-@interface __OAPCallbackList : NSObject {
-    NSMutableArray<NSDictionary<NSString *, NSString *> *> *_callbacks;
-}
+@interface __OAPCallbackList : NSObject
 - (NSUInteger)count;
 - (void)addCallbackWithName:(NSString *)name value:(NSString *)value;
 - (NSError *)deliverCallbacksToHandler:(void(^)(NSString *option,  NSString *_Nullable argument, NSError **error))handler;
 @end
-static const NSString *__OAPCallbackListOptionNameKey = @"__OAPCallbackListOptionNameKey";
-static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOptionValueKey";
+NSString * const __OAPCallbackListOptionNameKey = @"__OAPCallbackListOptionNameKey";
+NSString * const __OAPCallbackListOptionValueKey = @"__OAPCallbackListOptionValueKey";
+@interface __OAPCallbackList () {
+    NSMutableArray<NSDictionary<NSString *, NSString *> *> *_callbacks;
+}
+@end
 @implementation __OAPCallbackList
 - (instancetype)init {
     if (!(self = [super init])) { return nil; }
@@ -55,20 +57,22 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
 
 @interface OAPArgumentParser ()
-@property (assign) BOOL usesProcessArguments;
+@property (nonatomic, assign) BOOL usesProcessArguments;
 @end
+
 @implementation OAPArgumentParser
+@synthesize matchLimit = _matchLimit;
 
 + (NSInteger) compare:(NSString *)stringA withString:(NSString *) stringB /*matchGain:(NSInteger)gain missingCost:(NSInteger)cost*/ {
     NSInteger gain = 0;
     NSInteger cost = 1;
     NSInteger k, i, j, change, *d, distance;
-    NSUInteger n = [stringA length] + 1;
-    NSUInteger m = [stringB length] + 1;
+    NSInteger n = (NSInteger)[stringA length] + 1;
+    NSInteger m = (NSInteger)[stringB length] + 1;
     
     assert(n > 1 && m > 1);
 
-    d = malloc(sizeof(NSInteger) * m * n);
+    d = malloc(sizeof(NSInteger) * (unsigned long)m * (unsigned long)n);
     
     for( k = 0; k < n; k++)
         d[k] = k;
@@ -78,7 +82,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     
     for (i = 1; i < n; i++) {
         for (j = 1; j < m; j++) {
-            if ([stringA characterAtIndex:(i - 1)] == [stringB characterAtIndex:(j - 1)]) {
+            if ([stringA characterAtIndex:((NSUInteger)i - 1)] == [stringB characterAtIndex:((NSUInteger)j - 1)]) {
                 change = -gain;
             } else {
                 change = cost;
@@ -109,7 +113,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 #else
 + (NSError *)errorWithDomain:(NSErrorDomain)domain code:(NSInteger)code file:(char *)file line:(int)line userInfo:(nullable NSDictionary<NSString *, id> *)dict {
 #endif //#if MAC_OS_X_VERSION_10_13 > 0
-    NSMutableDictionary *userDict = [dict?:@{} mutableCopy];
+    NSMutableDictionary *userDict = [(dict ? dict : @{}) mutableCopy];
 
     assert(domain == OAPErrorDomain);
 
@@ -132,7 +136,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
                            [failureReasonError stringByReplacingCharactersInRange:NSMakeRange(0,1)
                                                                        withString:[[failureReasonError substringToIndex:1] lowercaseString]] ];
             if ([userDict[OAPErrorPossibilitiesKey] count] > 0) {
-                recoverySuggestionError = [NSString stringWithFormat:@"Valid options: %@", [[userDict[OAPErrorPossibilitiesKey] allObjects] componentsJoinedByString:@", "]];
+                recoverySuggestionError = [NSString stringWithFormat:@"Valid options: %@", [[(NSSet *)userDict[OAPErrorPossibilitiesKey] allObjects] componentsJoinedByString:@", "]];
             }
             break;
 
@@ -199,7 +203,7 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
     if (!(self = [super init])) { return nil; }
     
     self->_arguments = [args copy];
-    self->_argumentOffset = -1;
+    self->_argumentOffset = NSUIntegerMax;
     
     return self;
 }
@@ -214,7 +218,6 @@ static const NSString *__OAPCallbackListOptionValueKey = @"__OAPCallbackListOpti
 
 // @property NSInteger argumentOffset;
 @synthesize argumentOffset = _argumentOffset;
-
 @synthesize usesProcessArguments = _usesProcessArguments;
 
 //
@@ -320,7 +323,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
     }
 }
 
-- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError **)pError handler:(void(^)(NSString *option,  NSString *_Nullable parameter, NSError **error))handler {
+- (BOOL)parseOptions:(NSSet<NSString *> *)options error:(NSError * _Nullable __autoreleasing * _Nullable)pError handler:(void(^)(NSString *option,  NSString * _Nullable parameter, NSError * _Nullable __autoreleasing * _Nullable error))handler {
     __block NSError *error = nil;
     __OAPCallbackList *callbacks = [__OAPCallbackList new];
     
@@ -329,13 +332,13 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         return YES;
     }
     
-    if (self->_argumentOffset < 0) {
+    if (self->_argumentOffset == NSUIntegerMax) {
         self->_argumentOffset = self->_usesProcessArguments ? 1 : 0;
     }
     
     optionValidator(self, options);
     
-    __block NSInteger argumentOffset = self->_argumentOffset;
+    __block NSUInteger argumentOffset = self->_argumentOffset;
     __block NSArray<NSString *> *arguments = self->_arguments;
 
     //
@@ -449,7 +452,7 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Concatenated single-char options
         //
-        const NSInteger prevArgumentOffset = argumentOffset;
+        const NSUInteger prevArgumentOffset = argumentOffset;
         _Bool hasHyphen = false;
         NSUInteger i;
         for (i = 0; i < token.length; i++) {
@@ -501,8 +504,8 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Prefix matching
         //
-        NSSet<NSString *> *prefixMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *token, NSString *option) {
-            return [option hasPrefix:token];
+        NSSet<NSString *> *prefixMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *aToken, NSString *option) {
+            return [option hasPrefix:aToken];
         }];
         if (self->_matchPrefixes && prefixMatches.count == 1) {
             fuzzyMatch = sanitizedNameForOption([prefixMatches anyObject]);
@@ -515,8 +518,8 @@ static void optionValidator(OAPArgumentParser *self, NSSet<NSString *> *options)
         //
         // Levenshtein matching
         //
-        NSSet<NSString *> *levenshteinMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *token, NSString *option) {
-            return [[self class] compare:parsedOptionName withString:option] <= (option.length / 3);
+        NSSet<NSString *> *levenshteinMatches = [[self class] matchesForParsedOptionName:parsedOptionName withOptions:options heuristic:^BOOL(NSString *aToken, NSString *option) {
+            return [[self class] compare:parsedOptionName withString:option] <= (NSInteger)(option.length / 3);
         }];
         if (self->_fuzzyMatching && levenshteinMatches.count == 1) {
             fuzzyMatch = sanitizedNameForOption([levenshteinMatches anyObject]);

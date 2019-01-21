@@ -27,7 +27,7 @@
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-c"]];
     parser.matchPrefixes = YES;
     NSSet<NSString *> *options = [NSSet setWithArray:(@[@"-cocoa", @"-cabana"])];
-    XCTAssertFalse([parser parseOptions:options error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:options error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail();
     }]);
     XCTAssertNotNil(error);
@@ -47,7 +47,7 @@
 - (void)testInvalidColonSuffixArgument {
     NSError *error = nil;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo:"]];
-    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail();
     }]);
     XCTAssertNotNil(error);
@@ -57,7 +57,7 @@
 - (void)testInvalidOption {
     NSError *error = nil;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo"]];
-    XCTAssertFalse([parser parseOptions:[NSSet set] error:&error handler:^(NSString *name, NSString *value, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet set] error:&error handler:^(NSString *name, NSString *value, NSError **outError) {
         XCTFail(@"Parser should not have reported any options");
     }]);
     XCTAssertNotNil(error);
@@ -79,7 +79,7 @@
     NSError *error = nil;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"-f"]];
     NSSet<NSString *> *options = [NSSet setWithArray:(@[@"-foabar", @"-fabaod"])];
-    XCTAssertFalse([parser parseOptions:options error:&error handler:^(NSString *name, NSString *value, NSError **error) {
+    XCTAssertFalse([parser parseOptions:options error:&error handler:^(NSString *name, NSString *value, NSError **outError) {
         XCTFail(@"Parser should not have reported any options");
     }]);
     XCTAssertNotNil(error);
@@ -100,7 +100,7 @@
 - (void)testArgumentConcatenationTooFewArguments {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"xzfff", @"foo.tar", @"bar.file"]];
-    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"x", @"z", @"v", @"f:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
@@ -110,7 +110,7 @@
 - (void)testNoCallbacksOnFailure {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo", @"--bar"]];
-    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
@@ -120,7 +120,7 @@
 - (void)testNoParamOptionFailsWithEquals {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo=bar"]];
-    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
@@ -130,7 +130,7 @@
 - (void)testSpaceParamOptionFailsWithEquals {
     NSError *error;
     OAPArgumentParser *parser = [OAPArgumentParser parserWithArguments:@[@"--foo=bar"]];
-    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **error) {
+    XCTAssertFalse([parser parseOptions:[NSSet setWithArray:(@[@"--foo:"])] error:&error handler:^(NSString *option, NSString *argument, NSError **outError) {
         XCTFail(@"There should not be any callbacks when the parser fails");
     }]);
     XCTAssertNotNil(error);
